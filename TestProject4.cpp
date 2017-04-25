@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
+// Ghost comment
 
 struct part {
      char *description;
