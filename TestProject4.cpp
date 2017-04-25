@@ -26,23 +26,24 @@ struct kit {
 
 struct part *ReadAPart(FILE *filePtr) {
 	
-	struct part *partPtr = NULL;
+	struct part *newPart = NULL;
 	
+	newPart = (struct part*)malloc(sizeof(struct part));
+	newPart->description = (char*)malloc(sizeof(char)*100);
 	
-	partPtr = (struct part*)malloc(sizeof(struct part));
-	partPtr->description = (char*)malloc(sizeof(char)*100);
-	fscanf(filePtr, " %[^\n]s", partPtr->description);
-	printf("%s\n", partPtr->description);
-	fscanf(filePtr, "%d", &partPtr->qtyPerKit);
-	printf("%d ", partPtr->qtyPerKit);
-	fscanf(filePtr, " %lf", &partPtr->costPerItem);
-	printf("%.2lf\n", partPtr->costPerItem);
+	fscanf(filePtr, " %[^\n]s", newPart->description);
+	printf("%s\n", newPart->description);
+	
+	fscanf(filePtr, "%d", &newPart->qtyPerKit);
+	printf("%d ", newPart->qtyPerKit);
+	fscanf(filePtr, " %lf", &newPart->costPerItem);
+	printf("%lf\n", newPart->costPerItem);
 	
 	if(!feof(filePtr))													//if not end of file:
 	{
-	partPtr->nextPart = ReadAPart(filePtr);				
+	newPart->nextPart = ReadAPart(filePtr);				
 	}
-	return partPtr;	
+	return newPart;	
 }
 
 //struct kit *ReadAKit(FILE *filePtr) - this function will malloc space for a single kit, read in the name from filePtr, 
@@ -52,19 +53,22 @@ struct part *ReadAPart(FILE *filePtr) {
 //	Then return a pointer to the structure created. 
 
 struct kit *ReadAKit(FILE *filePtr) {
-	struct kit *kitPtr = NULL;
-	kitPtr = (struct kit*)malloc(sizeof(struct kit));
-	kitPtr->kitName = (char*)malloc(sizeof(char));
-	fscanf(filePtr, "%[^\n]s", kitPtr->kitName);	
-	printf("%s\n", kitPtr->kitName); //Check for correct name
-	ReadAPart(filePtr);	
+	struct kit *newKit = NULL;
+	newKit = (struct kit*)malloc(sizeof(struct kit));
+	newKit->kitName = (char*)malloc(sizeof(char));
+	fscanf(filePtr, "%[^\n]s", newKit->kitName);	
+	printf("%s\n", newKit->kitName); //Check for correct name
+	
+	newKit->firstPart = ReadAPart(filePtr);	
+	
+	return newKit;
 }
 
 //void PrintParts(struct part *currentPart) - this function will go through the linked list of parts and 
 //	print all of the parts that follow the part referenced by the pointer argument currentPart.  
 
 void PrintParts(struct part *currentPart) {
-	currentPart = (struct part*)malloc(sizeof(struct part));
+	
 		
 
 }
@@ -86,6 +90,8 @@ double TotalCost(struct kit *kitList) {
 }
 
 int main(void) {
+struct kit currentKit = NULL;	
+struct part *currentPart = NULL;	
 	
 	
 	FILE* currentFile = NULL;
@@ -116,7 +122,13 @@ int main(void) {
     }
 	while(!feof(currentFile)) 
 	{
-	ReadAKit(currentFile);
+	currentKit = ReadAKit(currentFile);
+	currentPart = currentKit->firstPart;
+	
+	PrintParts(currentPart);
+	
 	}
+	
+	
 	return 0;
 }
