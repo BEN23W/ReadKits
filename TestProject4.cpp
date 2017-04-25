@@ -27,22 +27,19 @@ struct kit {
 struct part *ReadAPart(FILE *filePtr) {
 	
 	struct part *newPart = NULL;
-	
 	newPart = (struct part*)malloc(sizeof(struct part));
 	newPart->description = (char*)malloc(sizeof(char)*100);
 	
 	fscanf(filePtr, " %[^\n]s", newPart->description);
-	printf("%s\n", newPart->description);
-	
 	fscanf(filePtr, "%d", &newPart->qtyPerKit);
-	printf("%d ", newPart->qtyPerKit);
 	fscanf(filePtr, " %lf", &newPart->costPerItem);
-	printf("%lf\n", newPart->costPerItem);
 	
 	if(!feof(filePtr))													//if not end of file:
 	{
-	newPart->nextPart = ReadAPart(filePtr);				
+		newPart->nextPart = ReadAPart(filePtr);				
 	}
+	
+
 	return newPart;	
 }
 
@@ -61,6 +58,8 @@ struct kit *ReadAKit(FILE *filePtr) {
 	
 	newKit->firstPart = ReadAPart(filePtr);	
 	
+	
+	
 	return newKit;
 }
 
@@ -68,9 +67,21 @@ struct kit *ReadAKit(FILE *filePtr) {
 //	print all of the parts that follow the part referenced by the pointer argument currentPart.  
 
 void PrintParts(struct part *currentPart) {
-	
-		
 
+	while (currentPart!=NULL){
+		
+		printf("%s\n", currentPart->description);
+		printf("%d ", currentPart->qtyPerKit);
+		printf("%lf\n", currentPart->costPerItem);
+	
+		if(currentPart->nextPart!= NULL)												
+		{
+			 PrintParts(currentPart->nextPart);				
+		}
+	
+	}
+		
+	return;
 }
 
 //double kitCost(struct kit *aKit) - this function goes through the kit referenced by aKit and 
@@ -90,7 +101,7 @@ double TotalCost(struct kit *kitList) {
 }
 
 int main(void) {
-struct kit currentKit = NULL;	
+struct kit *currentKit = NULL;	
 struct part *currentPart = NULL;	
 	
 	
@@ -110,6 +121,7 @@ struct part *currentPart = NULL;
 //	currentFile = fopen(fileName, "r");
 //	currentFile = fopen("samplefile.txt", "r"); //remove this after completion
 //	ReadAKit(currentFile);
+   
     currentFile = fopen(fileName, "r");
     if (currentFile != NULL)
     {
@@ -120,12 +132,28 @@ struct part *currentPart = NULL;
         printf("File failed to open");
 
     }
-	while(!feof(currentFile)) 
-	{
-	currentKit = ReadAKit(currentFile);
-	currentPart = currentKit->firstPart;
+	while(!feof(currentFile)) {
+		
+		currentKit = ReadAKit(currentFile);
 	
-	PrintParts(currentPart);
+		if(currentKit->firstPart == NULL){
+		
+		printf("\nList is empty\n");
+		}
+	
+		else
+		{	
+			currentPart = currentKit->firstPart;
+			
+			while(currentPart->nextPart != NULL)
+			{
+				currentPart = currentPart->nextPart;
+				currentPart->nextPart = ReadAPart(currentFile);
+			}
+			
+			PrintParts(currentPart);
+		}
+	
 	
 	}
 	
